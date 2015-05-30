@@ -3,8 +3,23 @@
     'use strict';
     define(['lodash'], function(_) {
         var RequestsController = function($scope, $interval, UserService, RequestTrackingService, ServerService, UtilService, RequestService, $log, $timeout) {
+            $scope.alerts = [];
             $scope.tasks = [];
             $scope.discoveredHostsLength = 0;
+            $scope.discoveredHosts = [];
+
+            $scope.reloadAlerts = function() {
+                ServerService.getList().then(function(hosts) {
+                    var alerts = [];
+                    _.each(hosts, function(host) {
+                        if(host.node_status === 1) {
+                            alerts.push('Host ' + host.node_name + ' is down');
+                        }
+                    });
+                    $scope.alerts = alerts;
+                });
+            };
+
             $scope.reloadTasks = function() {
                 RequestTrackingService.getTrackedRequests().then(function(tasks) {
                     $scope.tasks = tasks;
@@ -23,22 +38,31 @@
             }
 
             $scope.getDiscoveredHosts = function() {
-                $scope.discoveredHosts = [];
+
+                $scope.discoveredHosts = _.filter($scope.discoveredHosts, function(host)    {
+                    return host.state !== "ACCEPTED";
+                });
+
                 ServerService.getDiscoveredHosts().then(function(freeHosts) {
                    _.each(freeHosts, function(freeHost) {
-                    var host = {
-                        hostname: freeHost.node_name,
-                        ipaddress: freeHost.management_ip,
-                        state: "UNACCEPTED",
-                        selected: false
-                    };
-                    $scope.discoveredHosts.push(host);
+                        var host = {
+                            hostname: freeHost.node_name,
+                            ipaddress: freeHost.management_ip,
+                            state: "UNACCEPTED",
+                            selected: false
+                        };
+
+                        var isPresent = false;
+
+                        isPresent = _.some($scope.discoveredHosts, function(dHost)  {
+                            return dHost.hostname === host.hostname;
+                        });
+
+                        if(!isPresent)  {
+                            $scope.discoveredHosts.push(host);
+                        }
                    });
                 });
-            }
-            $scope.getAlert=function() {
-                 $scope.alerts=["Notification1","Notification2","Notification3","Notification4"];
-                 return alerts;
             }
 
             $scope.acceptHost = function(host) {
@@ -88,8 +112,10 @@
                 });
             };
 
-            //$interval($scope.reloadTasks, 5000);
-            //$interval($scope.reloadDiscoveredHostsLength, 5000);
+            $interval($scope.getDiscoveredHosts, 3000);
+            $interval($scope.reloadAlerts, 6000);
+            $interval($scope.reloadTasks, 5000);
+            $interval($scope.reloadDiscoveredHostsLength, 5000);
         };
 
         return ['$scope', '$interval', 'UserService', 'RequestTrackingService', 'ServerService', 'UtilService', 'RequestService', '$log', '$timeout', RequestsController];
