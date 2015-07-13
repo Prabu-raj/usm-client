@@ -14,7 +14,7 @@
     </div>
   </div>
   
-  <div class="row blade-view" ng-class="cluster.cluster_status==4 ? 'blade-view-with-opacity':'' " ng-repeat="cluster in clusters | filter:search">
+  <div id="desktop" class="row blade-view" ng-class="cluster.cluster_status==4 ? 'blade-view-with-opacity':'' " ng-repeat="cluster in clusters | filter:search">
       <div class="col-md-2 col-sm-4">
         <div class="row">
           <div class="col-md-1" ng-class="getClusterTypeTitle(cluster.cluster_type)==='Gluster'?'vertical-line-for-gluster':'vertical-line-for-ceph'">
@@ -96,5 +96,65 @@
         </a>
       </div>
    </div>
+
+  <div id="mobile" class="panel-group row blade-view" ng-model="panels.activePanel" role="tablist" aria-multiselectable="true" bs-collapse ng-class="cluster.cluster_status==4 ? 'blade-view-with-opacity':'' " ng-repeat="cluster in clusters | filter:search">
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab">
+        <h4 class="panel-title">
+          <a bs-collapse-toggle class="cluster-link">{{cluster.cluster_name}}</a>
+        </h4>
+      </div>
+      <div id="{{cluster.cluster_name}}" class="panel-collapse" role="tabpanel" bs-collapse-target>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-xs-1 exclamation-margin">
+              <span ng-if="cluster.cluster_status != 4 && getStatusTitle(cluster.cluster_status) === 'Failed'">
+                <i class="fa fa-2x fa-exclamation-triangle exclamation-mark warning"></i>
+              </span>
+            </div>
+            <div class="col-xs-5">
+              <a ng-href="#/clusters/detail/{{cluster.cluster_id}}">
+                <span class="heading-mobile" ng-bind="cluster.cluster_name"></span>
+              </a>
+            </div>
+             <div class="col-xs-6 text-right">
+              <span ng-bind="getClusterTypeTitle(cluster.cluster_type)"></span>
+            </div>
+          </div>
+          <div  class="col-xs-3 set-top-margin text-left">
+             <div class="sub-heading text-left" ng-if="cluster.cluster_status != 4">Used</div>
+             <div  class="sub-heading text-left" ng-class="cluster.percent_used >= 90 ?'critical':cluster.percent_used >= 80 ?'warning':'ok'" ng-if="cluster.cluster_status != 4">{{cluster.percent_used}}%</div>
+          </div>
+          <div class="col-xs-3 set-top-margin">
+            <div class="sub-heading">Hosts</div>
+            <div class="sub-heading" ng-bind="cluster.no_of_hosts"></div>
+          </div>
+          <div class="col-xs-3 set-top-margin">
+            <div class="sub-heading">
+              <span ng-if="getClusterTypeTitle(cluster.cluster_type) === 'Gluster'">Volumes</span>
+              <span ng-if="getClusterTypeTitle(cluster.cluster_type) === 'Ceph'">Pools</span>
+            </div>
+            <div class="sub-heading" ng-bind="cluster.no_of_volumes_or_pools"></div>
+          </div>
+          <div class="col-xs-2 set-top-margin">
+            <div class="sub-heading">Alerts</div>
+            <div class="sub-heading">
+              <span ng-bind="cluster.alerts"></span>
+              <i class="fa fa-2x set-margin" ng-class="cluster.alerts>0?'fa-times-circle critical':'fa-check-circle-o ok'"></i>
+            </div>
+          </div>
+          <div class="col-xs-1 set-top-margin text-right" >
+            <div class="row" >
+              <div class="span9 row-height set-pading">
+                <a><i class="fa fa-trash-o " ng-click="remove(cluster.cluster_id)"></i></a>
+              </div>
+              <div class="span9 row-height set-pading">
+                <a><i class="fa fa-arrows-alt" ng-click="expand(cluster.cluster_id)"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-</section>

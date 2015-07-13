@@ -303,3 +303,48 @@
 .elipsis-color {
     color : #bbb;
 }
+ 
+@media only screen and (max-width:768px){
+    #percentage {
+        margin-top:35px;
+    }
+
+    #desktop    {
+        display : none;
+    }
+
+    .blade-view {
+        min-height:0px;
+    }
+
+    .blade-view .set-top-margin {
+        margin-top:10px;
+    } 
+
+    .cluster-link    {
+        display:block;
+        width:700px;
+    }
+
+    .heading-mobile {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    .row-height {
+        height: 25px;
+    }
+
+    .set-padding{
+        padding-right:2px;
+    }
+
+    .exclamation-margin {
+        margin-top:9px;
+    }
+}
+
+@media only screen and (min-width:769px){
+    #mobile   {
+        display : none;
+    }
+}
